@@ -1,0 +1,125 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
+
+
+## Loading and preprocessing the data
+<<<<<<< HEAD
+```{r}
+library(tidyverse)
+unzip("activity.zip")
+steps_5min <- read_csv("activity.csv",col_types = cols(col_double(),col_date(format="%Y-%m-%d"),col_double()))
+```
+=======
+>>>>>>> exercise/master
+
+
+
+## What is mean total number of steps taken per day?
+<<<<<<< HEAD
+```{r}
+library(lubridate)
+steps_daily <- steps_5min %>% 
+        group_by(date) %>%
+        summarize(steps_day = sum(steps))
+
+ggplot(steps_daily, aes(x=steps_day) ) +
+  geom_histogram(bins=50) +
+  labs(title="Histogram of steps taken per day",x="Steps per day")
+
+steps_mean <- mean(steps_daily$steps_day, na.rm = TRUE) %>% round(0)
+steps_median <- median(steps_daily$steps_day, na.rm = TRUE) %>% round(0)
+        
+paste0("The mean number of steps taken per day is ",steps_mean,", and the median is ",steps_median)
+```
+=======
+>>>>>>> exercise/master
+
+
+
+## What is the average daily activity pattern?
+
+<<<<<<< HEAD
+```{r}
+steps_5min_avg <- steps_5min %>%
+  group_by(interval) %>%
+  drop_na %>%
+  summarize(steps_interval = mean(steps))
+  
+ggplot(steps_5min_avg, aes(x=interval,y=steps_interval) ) +
+  geom_line() +
+  labs(title="Daily activity based on steps per 5 min interval for 60 days",x="5 min interval (total 24h)",y="Step count")
+
+steps_interval_max <- max(steps_5min_avg$steps_interval) %>% round(0)
+
+paste0("The maximum number of steps on average for each time period of 5 minutes, across all days is ",steps_interval_max," steps.")
+```
+
+
+## Imputing missing values
+```{r}
+total_na <- sum(is.na(steps_5min))
+paste0("The total number of NA's in the dataset is ",total_na)
+
+## Replace NAs with the daily average
+
+### Create the daily average and add it as a column, then expand the dataframe into the original 5min intervals and add the variable for the average for the intervals
+steps_expanded <- steps_5min %>%
+  group_by(date) %>%
+  summarize(steps_avg = round( mean(steps),0 )) %>%
+  ungroup %>%
+  left_join(steps_5min,by="date") %>%
+  left_join(steps_5min_avg,by="interval")
+
+### Create new dataset without NAs
+steps_clean <- steps_expanded
+
+### Check if there are NAs in the daily average. If so, impute the interval average
+steps_clean$steps_avg <- ifelse(is.na(steps_clean$steps_avg), steps_clean$steps_interval, steps_clean$steps_avg)
+
+### Check if there are NAs in the steps count. If so, impute the daily average
+steps_clean$steps <- ifelse(is.na(steps_clean$steps), steps_clean$steps_avg, steps_clean$steps)
+
+### A message to account for the total NAs
+paste0("After the imputation treatment, there are ",sum(is.na(steps_clean))," NAs")
+
+### Histogram of steps each day
+steps_day <- steps_clean %>% 
+        group_by(date) %>%
+        summarize(steps_day = sum(steps))
+
+ggplot(steps_day, aes(x=steps_day) ) +
+  geom_histogram(bins=50) +
+  labs(title="Histogram of steps taken per day",x="Steps per day")
+
+### New statistics
+steps_mean_new <- mean(steps_day$steps_day) %>% round(0)
+steps_median_new <- median(steps_day$steps_day) %>% round(0)
+
+paste0("The mean with NAs vs the mean without NAs is ",steps_mean," vs ",steps_mean_new,", which is a difference of ",steps_mean-steps_mean_new)
+paste0("The median with NAs vs the median without NAs is ",steps_median," vs ",steps_median_new,", which is a difference of ",steps_median-steps_median_new)
+print("There is no statistical impact on the dataset for the imputation of averaged values")
+                       
+```
+=======
+
+
+## Imputing missing values
+>>>>>>> exercise/master
+
+
+
+## Are there differences in activity patterns between weekdays and weekends?
+<<<<<<< HEAD
+```{r}
+### Show which day is it
+steps_week <- steps_clean %>%
+  mutate(day_type = factor(weekdays(date))) %>%
+  mutate(day_type = fct_collapse(day_type, weekday = c("Monday","Tuesday","Wednesday","Thursday","Friday"), weekend = c("Saturday","Sunday")))
+```
+
+=======
+>>>>>>> exercise/master
